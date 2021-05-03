@@ -1,0 +1,1868 @@
+  openapi: 3.0.1
+  info:
+    title: Anethum-web API
+    description: Agave API
+    version: 0.0.1
+    contact:
+      email: ymn@i-mt.net
+  servers:
+    - url: http://localhost:5000/v1.0
+      description: local development server
+    - url: http://3.12.15.106/v1.0
+      description: aws ec2 server for testing
+  paths:
+    /leaverequest:
+      post:
+        tags:
+          - requests
+        summary: Запрос на создание заявки для подключения
+        operationId: request
+        requestBody:
+          description: Данные клиента для связи
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - phone
+                  - email
+                properties:
+                  name:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /account/registration:
+      post:
+        tags:
+          - account
+        summary: Запрос на регистрацию пользователя
+        operationId: register_user
+        requestBody:
+          description: Данные пользователя для регистрации
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                  - lastname
+                  - name
+                  - middlename
+                  - password
+                properties:
+                  lastname:
+                    type: string
+                  name:
+                    type: string
+                  middlename:
+                    type: string
+                  email:
+                    type: string
+                  password:
+                    type: string
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /account/authorization/psw:
+      post:
+        tags:
+          - account
+        summary: Запрос на авторизацию пользователя по паролю
+        operationId: authorize_via_psw
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                  - password
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /account/password/recovery:
+      post:
+        tags:
+          - account
+        summary: Запрос на востановление пароля пользователя
+        operationId: password_recovery
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                properties:
+                  email:
+                    type: string
+        deprecated: true
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /account/session/renewal:
+      post:
+        tags:
+          - account
+        summary: Запрос на возобновление сеанса
+        operationId: renew_session
+        parameters:
+          - in: query
+            name: renewalToken
+            schema:
+              type: string
+            required: true
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /account/session/logout:
+      post:
+        tags:
+          - account
+        summary: Запрос на завершение сессии
+        security:
+          - basicAuth: []
+        operationId: session_logout
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /profile:
+      get:
+        tags:
+          - profile
+        summary: Запрос на получение данных профиля пользователя
+        operationId: get_profile
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      put:
+        tags:
+          - profile
+        summary: Запрос на изменение данных профиля пользователя
+        operationId: update_profile
+        security:
+          - basicAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - photo
+                properties:
+                  lastname:
+                    type: string
+                  name:
+                    type: string
+                  middlename:
+                    type: string
+                  photo:
+                    type: string
+                  organization:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                      phone:
+                        type: string
+                      address:
+                        type: string
+                      inn:
+                        type: string
+                      photo:
+                        type: string
+                      staff:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            role:
+                              type: string
+                            name:
+                              type: string
+                            position:
+                              type: string
+                            phone:
+                              type: string
+                            email:
+                              type: string
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /profile/photo/upload:
+      post:
+        tags:
+          - profile
+        summary: Запрос на загрузку фотографии
+        operationId: photo_upload
+        security:
+          - basicAuth: []
+        requestBody:
+          content:
+            # image/png:
+            #   schema:
+            #     type: string
+            #     format: binary
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  somedata:
+                    type: string
+                  fileName:
+                    type: string
+                    format: binary
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /langs:
+      get:
+        tags:
+          - langs
+        summary: Запрос на получение списка поддерживаемых языков
+        operationId: get_langs
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /roles:
+      get:
+        tags:
+          - roles
+        summary: Запрос на получение списка ролей
+        operationId: get_roles
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /types:
+      get:
+        tags:
+          - types
+        summary: Запрос на получение типов поддерживаемых устройств
+        operationId: get_types
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities:
+      post:
+        tags:
+          - facilities
+        summary: Запрос на создание предприятия
+        operationId: add_facility
+        security:
+          - basicAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      get:
+        tags:
+          - facilities
+        summary: Запрос на получение списка предприятий пользователя
+        operationId: get_facilities
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}:
+      get:
+        tags:
+          - facilities
+        summary: Запрос на получение информации о предприятии
+        operationId: get_facility
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      put:
+        tags:
+          - facilities
+        summary: Запрос на изменение информации о предприятии
+        operationId: update_facility
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to put
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                  address:
+                    type: string
+                  photo:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - facilities
+        summary: Запрос на удаление предприятия
+        operationId: del_facility
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to delete
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/equipments:
+      post:
+        tags:
+          - equipments
+        summary: Запрос на создание оборудования на объекте-предприятии
+        operationId: add_equipment
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to add
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      get:
+        tags:
+          - equipments
+        summary: Запрос на получение списка оборудования объекта-предприятия
+        operationId: get_equipments
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/equipments/{equipmentId}:
+      get:
+        tags:
+          - equipments
+        summary: Запрос на получение оборудования объекта-предприятия
+        operationId: get_equipment
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: equipmentId
+            schema:
+              type: string
+            required: true
+            description: ID of the equipment
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      put:
+        tags:
+          - equipments
+        summary: Запрос на изменение оборудования объекта-предприятия
+        operationId: update_equipment
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: equipmentId
+            schema:
+              type: string
+            required: true
+            description: ID of the equipment
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - equipments
+        summary: Запрос на удаление оборудования объекта-предприятия
+        operationId: delete_equipment
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: equipmentId
+            schema:
+              type: string
+            required: true
+            description: ID of the equipment
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/groups:
+      post:
+        tags:
+          - groups
+        summary: Запрос на создание группы устройств на объекте
+        operationId: create_group
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - type
+                properties:
+                  name:
+                    type: string
+                  equipment:
+                    type: string
+                  type:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      get:
+        tags:
+          - groups
+        summary: Запрос на получение списка групп объекта
+        operationId: get_groups
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: query
+            name: name
+            schema:
+              type: string
+          - in: query
+            name: equipments
+            schema:
+              type: array
+              items:
+                type: string
+          - in: query
+            name: types
+            schema:
+              type: array
+              items:
+                type: string
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/groups/{groupId}:
+      get:
+        tags:
+          - groups
+        summary: Запрос на получение групп объекта
+        operationId: get_group
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: groupId
+            schema:
+              type: string
+            required: true
+            description: ID of the group to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - groups
+        summary: Запрос на удаление группы объекта
+        operationId: del_group
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: groupId
+            schema:
+              type: string
+            required: true
+            description: ID of the group to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/employees:
+      get:
+        tags:
+          - employees
+        summary: Запрос на получение всех сотрудников предприятия
+        operationId: get_employees
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/employees/{employeeId}:
+      get:
+        tags:
+          - employees
+        summary: Запрос на получение информации о сотруднике
+        operationId: get_employee
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: employeeId
+            schema:
+              type: string
+            required: true
+            description: ID of the employee to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      put:
+        tags:
+          - employees
+        summary: Запрос на изменение данных сотрудника
+        operationId: put_employee
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: employeeId
+            schema:
+              type: string
+            required: true
+            description: ID of the employee to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - role
+                properties:
+                  role:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - employees
+        summary: Запрос на удаление сотрудника из предприятия
+        operationId: delete_employee
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: employeeId
+            schema:
+              type: string
+            required: true
+            description: ID of the employee
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/registration:
+      post:
+        tags:
+          - things
+        summary: Запрос на регистрацию вещи
+        operationId: register_thing
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - serial
+                properties:
+                  serial:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/registration/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку завершения регистрации вещи
+        operationId: check_thing_registration_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things:
+      get:
+        tags:
+          - things
+        summary: Запрос на получение списка вещей предприятия
+        operationId: get_things
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: query
+            name: types
+            schema:
+              type: array
+              default: null
+              items:
+                type: string
+          - in: query
+            name: equipments
+            schema:
+              type: array
+              default: null
+              items:
+                type: string
+          - in: query
+            name: hubs
+            schema:
+              type: array
+              default: null
+              items:
+                type: string
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на получение информации о вещи
+        operationId: get_thing
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      put:
+        tags:
+          - things
+        summary: Запрос на изменение вещи
+        operationId: put_thing
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                properties:
+                  name:
+                    type: string
+                  equipment:
+                    type: string
+                  enabled:
+                    type: boolean
+                  initialized:
+                    type: boolean
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - things
+        summary: Запрос на удаление вещи
+        operationId: del_thing
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/pair:
+      post:
+        tags:
+          - things
+        summary: Запрос на запуск режима сопряжения хаба
+        operationId: pair_things
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/pair/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку завершения работы режима сопряжения
+        operationId: check_thing_pairing_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/files/update:
+      post:
+        tags:
+          - things
+        summary: Запрос на обновление файлов устройства
+        operationId: update_thing_files
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/files/update/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку завершения обновления файлов
+        operationId: check_file_update_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/reboot:
+      post:
+        tags:
+          - things
+        summary: Запрос на запуск перезагрузки хаба
+        operationId: reboot_things
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/reset:
+      post:
+        tags:
+          - things
+        summary: Запрос на сброс БД устройства
+        operationId: reset_things
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/logs:
+      get:
+        tags:
+          - logs
+        summary: Запрос на получение логов
+        operationId: get_logs
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        deprecated: true
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /files/{fileId}:
+      get:
+        tags:
+          - files
+        summary: Запрос на получение файла по id
+        operationId: get_file
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: fileId
+            description: id of file
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /things/{thingId}/files:
+      get:
+        tags:
+          - files
+        summary: Запрос на получение списка файлов устройства
+        operationId: get_thing_files
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: query
+            name: types
+            schema:
+              type: array
+              items:
+                type: string
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/files:
+      get:
+        tags:
+          - files
+        summary: Запрос на получение списка файлов устройства на объекте
+        operationId: get_files
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: query
+            name: types
+            schema:
+              type: array
+              items:
+                type: string
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /things/{thingId}/journals:
+      get:
+        tags:
+          - journals
+        summary: Запрос на получение журналов устройства
+        operationId: get_thing_journals
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: query
+            name: types
+            schema:
+              type: array
+              items:
+                type: string
+          - in: query
+            name: timestampGte
+            schema:
+              type: number
+          - in: query
+            name: timestampLte
+            schema:
+              type: number
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/journals:
+      get:
+        tags:
+          - journals
+        summary: Запрос на получение журналов устройства на объекте
+        operationId: get_journals
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: query
+            name: types
+            schema:
+              type: array
+              items:
+                type: string
+          - in: query
+            name: timestampGte
+            schema:
+              type: number
+          - in: query
+            name: timestampLte
+            schema:
+              type: number
+          - $ref: '#/components/parameters/start'
+          - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/logs/voltage:
+      post:
+        tags:
+          - logs
+        summary: Запрос на получение логов напряжения вещи
+        operationId: get_logs2
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sensor_tag
+                properties:
+                  sensor_tag:
+                    type: string
+                  period:
+                    type: string
+                  group_by:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/logs/temperature:
+      post:
+        tags:
+          - logs
+        summary: Запрос на получение логов температуры вещи
+        operationId: get_temperature_logs
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sensor_tag
+                properties:
+                  sensor_tag:
+                    type: string
+                  period:
+                    type: string
+                  group_by:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/equipments/{equipmentId}/logs/voltage:
+      post:
+        tags:
+          - logs
+        summary: Запрос на получение логов напряжения оборудования
+        operationId: get_equipment_logs_v
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: equipmentId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sensor_tag
+                properties:
+                  sensor_tag:
+                    type: string
+                  period:
+                    type: string
+                  group_by:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/equipments/{equipmentId}/logs/temperature:
+      post:
+        tags:
+          - logs
+        summary: Запрос на получение логов температуры оборудования
+        operationId: get_equipment_logs_t
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: equipmentId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - sensor_tag
+                properties:
+                  sensor_tag:
+                    type: string
+                  period:
+                    type: string
+                  group_by:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/logs/laurel:
+      post:
+        tags:
+          - logs
+        summary: Запрос на получение логов Лауреля
+        operationId: get_logs_laurel
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - table
+                properties:
+                  table:
+                    type: string
+                  period:
+                    type: string
+                  group_by:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /invites:
+      get:
+        tags:
+          - invites
+        summary: Запрос на получение списка приглашений пользователя
+        operationId: get_invites
+        security:
+          - basicAuth: []
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /invites/{inviteId}:
+      post:
+        tags:
+          - invites
+        summary: Запрос на принятие приглашения пользователя
+        operationId: accept_invite
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: inviteId
+            schema:
+              type: string
+            required: true
+            description: ID of the invite to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      delete:
+        tags:
+          - invites
+        summary: Запрос на удаление приглашения пользователя
+        operationId: del_invite
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: inviteId
+            schema:
+              type: string
+            required: true
+            description: ID of the invite to delete
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/invites:
+      post:
+        tags:
+          - invites
+        summary: Запрос на создание приглашения в объект-подстанцию
+        operationId: add_facility_invite
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - email
+                properties:
+                  email:
+                    type: string
+                  role:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      get:
+        tags:
+          - invites
+        summary: Запрос на получение списка приглашений в объект-подстанцию
+        operationId: get_facility_invites
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/invites/{inviteId}:
+      delete:
+        tags:
+          - invites
+        summary: Запрос на удаление приглашения в объект-подстанцию
+        operationId: del_facility_invite
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to del
+          - in: path
+            name: inviteId
+            schema:
+              type: string
+            required: true
+            description: ID of the invite to del
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+  components:
+    securitySchemes:
+      basicAuth:
+        type: http
+        scheme: basic
+    schemas:
+      response:
+        type: object
+        properties:
+          status:
+            type: string
+          code:
+            type: number
+          result:
+            type: object
+    parameters:
+      lang:
+        name: lang
+        in: query
+        description: >
+          Language:
+           * `en` - english
+           * `ru` - russian
+        schema:
+          type: string
+      start:
+        name: start
+        in: query
+        description: Starts from
+        schema:
+          type: integer
+          default: 0
+      limit:
+        name: limit
+        in: query
+        description: Limit by
+        schema:
+          type: integer
+          default: 50
