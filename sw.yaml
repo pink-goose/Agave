@@ -6,7 +6,7 @@
     contact:
       email: ymn@i-mt.net
   servers:
-    - url: http://localhost:5000/v1.0
+    - url: https://agave.world/v1.0
       description: local development server
     - url: http://3.12.15.106/v1.0
       description: aws ec2 server for testing
