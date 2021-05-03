@@ -7,7 +7,7 @@
       email: ymn@i-mt.net
   servers:
     - url: https://agave.world/v1.0
-      description: local development server
+      description: prod server
     - url: http://3.12.15.106/v1.0
       description: aws ec2 server for testing
   paths:
