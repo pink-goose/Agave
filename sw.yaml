@@ -6,10 +6,14 @@
     contact:
       email: ymn@i-mt.net
   servers:
-    - url: https://agave.world/v1.0
-      description: prod server
-    - url: http://3.12.15.106/v1.0
-      description: aws ec2 server for testing
+    - url: http://agave.world/v1.0
+      description: Production server
+    - url: http://localhost:5000/v1.0
+      description: Local development server
+    - url: http://80.254.51.184/v1.0
+      description: SPB testing server
+    - url: http://18.190.74.233/v1.0
+      description: AWS ec2 development server
   paths:
     /leaverequest:
       post:
@@ -101,33 +105,6 @@
                     type: string
                   password:
                     type: string
-        parameters:
-          - $ref: '#/components/parameters/lang'
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/response'
-    /account/password/recovery:
-      post:
-        tags:
-          - account
-        summary: Запрос на востановление пароля пользователя
-        operationId: password_recovery
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - email
-                properties:
-                  email:
-                    type: string
-        deprecated: true
         parameters:
           - $ref: '#/components/parameters/lang'
         responses:
@@ -278,6 +255,7 @@
                   fileName:
                     type: string
                     format: binary
+        deprecated: true
         parameters:
           - $ref: '#/components/parameters/lang'
         responses:
@@ -1242,6 +1220,39 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/reboot/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку запуска перезагрузки хаба
+        operationId: check_thing_reboot_request_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
     /facilities/{facilityId}/things/{thingId}/reset:
       post:
         tags:
@@ -1263,6 +1274,128 @@
               type: string
             required: true
             description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/reset/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку запуска сброса хаба
+        operationId: check_thing_reset_request_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/firmware:
+      get:
+        tags:
+          - things
+        summary: Запрос на получение информации о последней версии прошивки для устройства
+        operationId: firmware_version
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/firmware/update:
+      post:
+        tags:
+          - things
+        summary: Запрос на запуск обновления прошивки устройства
+        operationId: update_thing_firmware
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/firmware/update/{reqId}:
+      get:
+        tags:
+          - things
+        summary: Запрос на проверку завершения обновления прошивки
+        operationId: check_thing_pairing_complete1
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
           - $ref: '#/components/parameters/lang'
         responses:
           '200':
@@ -1299,6 +1432,24 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
+    /files/types:
+      get:
+        tags:
+          - files
+        summary: Запрос на получение типов поддерживаемых файлов(Firmware)
+        operationId: get_file_types
+        security:
+          - basicAuth: []
+        deprecated: true
+        parameters:
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
     /files/{fileId}:
       get:
         tags:
@@ -1307,6 +1458,7 @@
         operationId: get_file
         security:
           - basicAuth: []
+        deprecated: true
         parameters:
           - in: path
             name: fileId
@@ -1330,6 +1482,7 @@
         operationId: get_thing_files
         security:
           - basicAuth: []
+        deprecated: true
         parameters:
           - in: path
             name: thingId
@@ -1360,6 +1513,7 @@
         operationId: get_files
         security:
           - basicAuth: []
+        deprecated: true
         parameters:
           - in: path
             name: facilityId
@@ -1379,6 +1533,50 @@
                 type: string
           - $ref: '#/components/parameters/start'
           - $ref: '#/components/parameters/limit'
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /firmwares/{fileId}:
+      get:
+        tags:
+          - firmwares
+        summary: Запрос на получение информации о файле прошивки по id
+        operationId: get_firmware_file
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: fileId
+            description: id of file
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /firmwares/{fileId}/download:
+      get:
+        tags:
+          - firmwares
+        summary: Ссылка на загрузку файла прошивки по id
+        operationId: download_firmware_file
+        parameters:
+          - in: path
+            name: fileId
+            description: id of file
+            required: true
+            schema:
+              type: string
           - $ref: '#/components/parameters/lang'
         responses:
           '200':
