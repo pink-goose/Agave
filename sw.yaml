@@ -2,7 +2,7 @@
   info:
     title: Anethum-web API
     description: Agave API
-    version: 0.0.1
+    version: 0.1.0
     contact:
       email: ymn@i-mt.net
   servers:
@@ -935,6 +935,7 @@
             required: true
             description: ID of the facility to get
           - in: query
+            description: "['AgaveHub', 'Laurel', 'RepeyBase']"
             name: types
             schema:
               type: array
@@ -986,6 +987,14 @@
               type: string
             required: true
             description: ID of the thing to get
+          # - in: query
+          #   description: "Choises: ['device_info', 'registers']"
+          #   name: collections
+          #   schema:
+          #     type: array
+          #     default: null
+          #     items:
+          #       type: string
           - $ref: '#/components/parameters/lang'
         responses:
           '200':
@@ -1070,7 +1079,7 @@
     /facilities/{facilityId}/things/{thingId}/pair:
       post:
         tags:
-          - things
+          - hub
         summary: Запрос на запуск режима сопряжения хаба
         operationId: pair_things
         security:
@@ -1099,7 +1108,7 @@
     /facilities/{facilityId}/things/{thingId}/pair/{reqId}:
       get:
         tags:
-          - things
+          - hub
         summary: Запрос на проверку завершения работы режима сопряжения
         operationId: check_thing_pairing_complete
         security:
@@ -1132,7 +1141,7 @@
     /facilities/{facilityId}/things/{thingId}/files/update:
       post:
         tags:
-          - things
+          - devices
         summary: Запрос на обновление файлов устройства
         operationId: update_thing_files
         security:
@@ -1161,7 +1170,7 @@
     /facilities/{facilityId}/things/{thingId}/files/update/{reqId}:
       get:
         tags:
-          - things
+          - devices
         summary: Запрос на проверку завершения обновления файлов
         operationId: check_file_update_complete
         security:
@@ -1191,10 +1200,57 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/registers:
+      post:
+        tags:
+          - devices
+        summary: Запрос на получение значений определенных регистров Modbus
+        operationId: registers
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - registers
+                properties:
+                  registers:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        quantity:
+                          type: integer
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
     /facilities/{facilityId}/things/{thingId}/reboot:
       post:
         tags:
-          - things
+          - hub
         summary: Запрос на запуск перезагрузки хаба
         operationId: reboot_things
         security:
@@ -1223,7 +1279,7 @@
     /facilities/{facilityId}/things/{thingId}/reboot/{reqId}:
       get:
         tags:
-          - things
+          - hub
         summary: Запрос на проверку запуска перезагрузки хаба
         operationId: check_thing_reboot_request_complete
         security:
@@ -1256,7 +1312,7 @@
     /facilities/{facilityId}/things/{thingId}/reset:
       post:
         tags:
-          - things
+          - hub
         summary: Запрос на сброс БД устройства
         operationId: reset_things
         security:
@@ -1285,7 +1341,7 @@
     /facilities/{facilityId}/things/{thingId}/reset/{reqId}:
       get:
         tags:
-          - things
+          - hub
         summary: Запрос на проверку запуска сброса хаба
         operationId: check_thing_reset_request_complete
         security:
@@ -1318,7 +1374,7 @@
     /facilities/{facilityId}/things/{thingId}/firmware:
       get:
         tags:
-          - things
+          - hub
         summary: Запрос на получение информации о последней версии прошивки для устройства
         operationId: firmware_version
         security:
@@ -1345,7 +1401,7 @@
     /facilities/{facilityId}/things/{thingId}/firmware/update:
       post:
         tags:
-          - things
+          - hub
         summary: Запрос на запуск обновления прошивки устройства
         operationId: update_thing_firmware
         security:
@@ -1374,7 +1430,7 @@
     /facilities/{facilityId}/things/{thingId}/firmware/update/{reqId}:
       get:
         tags:
-          - things
+          - hub
         summary: Запрос на проверку завершения обновления прошивки
         operationId: check_thing_pairing_complete1
         security:
