@@ -1041,6 +1041,64 @@
                     type: boolean
                   initialized:
                     type: boolean
+                  shadow:
+                    type: object
+                    properties:
+                      interface:
+                        type: object
+                        # required:
+                        #   - port
+                        #   - baudrate
+                        #   - bytesize
+                        #   - slave_address
+                        #   - parity
+                        #   - stopbits
+                        #   - timeout
+                        properties:
+                          port:
+                            type: string
+                            enum: ['/dev/ttyUSB0', '/dev/ttyS1', '/dev/ttyS2']
+                            default: '/dev/ttyS1'
+                          baudrate:
+                            type: integer
+                            enum: [2400, 4800, 9600, 19200, 38400, 57600, 115200]
+                            default: 9600
+                          bytesize:
+                            type: integer
+                            minimum: 5
+                            maximum: 8
+                            default: 8
+                          slave_address:
+                            type: integer
+                            minimum: 0
+                            maximum: 256
+                            default: 1
+                          parity:
+                            type: string
+                            enum: ['N', 'E', 'O', 'M', 'S']
+                            default: 'N'
+                          stopbits:
+                            type: number
+                            enum: [1, 1.5, 2]
+                            default: 1
+                          timeout:
+                            type: number
+                            minimum: 0.05
+                            maximum: 3.0
+                            default: 0.05
+                      registers_list:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            start:
+                              type: string
+                              default: '0x0100'
+                            quantity:
+                              type: integer
+                              minimum: 0
+                              maximum: 300
+                              default: 1
         responses:
           '200':
             description: OK
@@ -1138,11 +1196,91 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/add:
+      post:
+        tags:
+          - devices
+        summary: Запрос на ручное добавление устройства
+        operationId: add_device
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the hub for binding
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - name
+                  - serial
+                  - interface
+                properties:
+                  name:
+                    type: string
+                  # type:
+                  #   type: string
+                  serial:
+                    type: string
+                  interface:
+                    type: object
+                    required:
+                      - port
+                      - baudrate
+                      - bytesize
+                      - slave_address
+                      - parity
+                      - stopbits
+                      - timeout
+                    properties:
+                      port:
+                        type: string
+                      baudrate:
+                        type: integer
+                      bytesize:
+                        type: integer
+                      slave_address:
+                        type: integer
+                      parity:
+                        type: string
+                      stopbits:
+                        type: number
+                      timeout:
+                        type: number
+                  registers_list:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        start:
+                          type: string
+                        quantity:
+                          type: integer
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
     /facilities/{facilityId}/things/{thingId}/files/update:
       post:
         tags:
           - devices
-        summary: Запрос на обновление файлов устройства
+        summary: Запрос на запуск обновления файлов устройства
         operationId: update_thing_files
         security:
           - basicAuth: []
