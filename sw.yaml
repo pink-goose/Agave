@@ -183,7 +183,7 @@
                 type: object
                 required:
                   - name
-                  - photo
+                  # - photo
                 properties:
                   lastname:
                     type: string
@@ -191,8 +191,8 @@
                     type: string
                   middlename:
                     type: string
-                  photo:
-                    type: string
+                  # photo:
+                  #   type: string
                   organization:
                     type: object
                     properties:
@@ -206,8 +206,8 @@
                         type: string
                       inn:
                         type: string
-                      photo:
-                        type: string
+                      # photo:
+                      #   type: string
                       staff:
                         type: array
                         items:
@@ -223,6 +223,15 @@
                               type: string
                             email:
                               type: string
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  # somedata:
+                  #   type: string
+                  file:
+                    type: string
+                    format: binary
         parameters:
           - $ref: '#/components/parameters/lang'
         responses:
@@ -232,7 +241,21 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
-    /profile/photo/upload:
+    /profile/photo:
+      get:
+        tags:
+          - profile
+        summary: Запрос на скачивание фотографии пользователя
+        operationId: photo_download
+        security:
+          - basicAuth: []
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
       post:
         tags:
           - profile
@@ -250,12 +273,12 @@
               schema:
                 type: object
                 properties:
-                  somedata:
-                    type: string
-                  fileName:
+                  # somedata:
+                  #   type: string
+                  file:
                     type: string
                     format: binary
-        deprecated: true
+        # deprecated: true
         parameters:
           - $ref: '#/components/parameters/lang'
         responses:
@@ -441,6 +464,60 @@
             required: true
             description: ID of the facility to delete
           - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/photo:
+      get:
+        tags:
+          - facilities
+        summary: Запрос на скачивание фотографии объекта
+        operationId: facility_photo_download
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+      post:
+        tags:
+          - facilities
+        summary: Запрос на загрузку фотографии объекта
+        operationId: facility_photo_upload
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility to get
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  file:
+                    type: string
+                    format: binary
         responses:
           '200':
             description: OK
@@ -1659,7 +1736,6 @@
         operationId: get_file
         security:
           - basicAuth: []
-        deprecated: true
         parameters:
           - in: path
             name: fileId
@@ -1683,44 +1759,7 @@
         operationId: get_thing_files
         security:
           - basicAuth: []
-        deprecated: true
         parameters:
-          - in: path
-            name: thingId
-            required: true
-            schema:
-              type: string
-          - in: query
-            name: types
-            schema:
-              type: array
-              items:
-                type: string
-          - $ref: '#/components/parameters/start'
-          - $ref: '#/components/parameters/limit'
-          - $ref: '#/components/parameters/lang'
-        responses:
-          '200':
-            description: OK
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/response'
-    /facilities/{facilityId}/things/{thingId}/files:
-      get:
-        tags:
-          - files
-        summary: Запрос на получение списка файлов устройства на объекте
-        operationId: get_files
-        security:
-          - basicAuth: []
-        deprecated: true
-        parameters:
-          - in: path
-            name: facilityId
-            required: true
-            schema:
-              type: string
           - in: path
             name: thingId
             required: true
