@@ -14,6 +14,8 @@
       description: SPB testing server
     - url: http://18.190.74.233/v1.0
       description: AWS ec2 development server
+    - url: http://agave24.com/v1.0
+      description: Cheb dev server
   paths:
     /leaverequest:
       post:
@@ -1469,6 +1471,84 @@
               application/json:
                 schema:
                   $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/modbus_command:
+      post:
+        tags:
+          - devices
+        summary: Отправка Modbus команды
+        operationId: modbus_command
+        security:
+          - basicAuth: []
+        description:
+          "command - modbus команда для выполнения в формате '03 0100 0001' \n\n
+          password_command - modbus команда для ввода пароля в формате '06 02 00 06 CB' (функция + адрес + пароль)"
+        parameters:
+          - in: path
+            name: facilityId
+            schema:
+              type: string
+            required: true
+            description: ID of the facility
+          - in: path
+            name: thingId
+            schema:
+              type: string
+            required: true
+            description: ID of the thing
+          - $ref: '#/components/parameters/lang'
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - command
+                properties:
+                  command:
+                    type: string
+                  password_command:
+                    type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
+    /facilities/{facilityId}/things/{thingId}/modbus_command/{reqId}:
+      get:
+        tags:
+          - devices
+        summary: Запрос на проверку выполнения команды
+        operationId: check_modbus_command_complete
+        security:
+          - basicAuth: []
+        parameters:
+          - in: path
+            name: facilityId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: thingId
+            required: true
+            schema:
+              type: string
+          - in: path
+            name: reqId
+            description: id of request
+            required: true
+            schema:
+              type: string
+          - $ref: '#/components/parameters/lang'
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/response'
     /facilities/{facilityId}/things/{thingId}/reboot:
       post:
         tags:
@@ -2286,7 +2366,7 @@
         in: query
         description: >
           Language:
-           * `en` - english
+           * `en` - englishgit
            * `ru` - russian
         schema:
           type: string
