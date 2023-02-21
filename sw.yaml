@@ -1524,6 +1524,8 @@
         operationId: check_modbus_command_complete
         security:
           - basicAuth: []
+        description:
+          "Возможные статусы: 'UNRESOLVED', 'ACCEPTED', 'RESOLVED', 'REJECTED'"
         parameters:
           - in: path
             name: facilityId
